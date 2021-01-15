@@ -42,9 +42,31 @@
         <password>hdfs</password>
 	<script>${hiveScript}</script>
     </hive2>
-    <ok to="end"/>
-    <error to="fail"/>
+    <ok to="SparkMLPipeline"/>
+    <error to="SparkMLPipeline"/>
     </action>
+
+<action name='SparkMLPipeline'>
+            <spark xmlns="uri:oozie:spark-action:0.1">
+              <job-tracker>${jobTracker}</job-tracker>
+              <name-node>${nameNode}</name-node>
+        <configuration>
+        <property>
+            <name>mapred.job.queue.name</name>
+            <value>${queueName}</value>
+        </property>
+        </configuration>
+              <master>${master}</master>
+	      <mode>cluster</mode>
+	      <name>Funnel</name>
+              <jar>hdfs://hw1.c.all-ih.internal:8020/user/refinedzone/deploy.py</jar>
+              <spark-opts> --queue ${queueName} </spark-opts>
+            </spark>
+            <ok to="end" />
+            <error to="fail" />
+          </action>
+
+
     <kill name="fail">
     <message>Job failed, error message[${wf:errorMessage(wf:lastErrorNode())}] </message>
     </kill>
